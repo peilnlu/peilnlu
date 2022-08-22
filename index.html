@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.66.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+<link rel="stylesheet" href="../css/normalize.css">
+<link rel="stylesheet" href="../css/skeleton.css">
+<link rel="stylesheet" href="../css/custom.css">
+<link rel="alternate" href="index.xml" type="application/rss+xml" title="Speech Research">
+<link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+<title>MeloForm: Generating Melody with Musical Form based on Expert Systems and Neural Networks</title>
+</head>
+<body>
+
+<div class="container">
+
+	<header role="banner">
+		
+			
+		
+		
+	</header>
+
+
+	<main role="main">
+		<article itemscope itemtype="https://schema.org/BlogPosting">
+            <h1 class="entry-title" itemprop="headline">MeloForm: Generating Melody with Musical Form based on Expert Systems and Neural Networks</h1>
+			
+			<section itemprop="entry-text">
+				<br>
+<!-- <p>ArXiv: <a href="https://arxiv.org/pdf/2109.09617.pdf">arXiv:2109.09617</a></p> -->
+<h2 id="authors">Authors</h2>
+<ul>
+<li>Peiling Lu (Microsoft Research Asia) <a href="mailto:peil@microsoft.com">peil@microsoft.com</a></li>
+<li>Xu Tan^ (Microsoft Research Asia) <a href="mailto:xuta@microsoft.com">xuta@microsoft.com</a></li>
+<li>Botao Yu (Nanjing University) <a href="mailto:btu@smail.nju.edu.cn">btu@smail.nju.edu.cn</a></li>
+<li>Sheng Zhao (Microsoft Software Technology Center Asia) <a href="mailto:szhao@microsoft.com">szhao@microsoft.com</a></li>
+<li>Tao Qin (Microsoft Research Asia ) <a href="mailto:taoqin@microsoft.com">taoqin@microsoft.com</a></li>
+<li>Tie-Yan Liu (Microsoft Research) <a href="mailto:tyliu@microsoft.com">tyliu@microsoft.com</a></li>
+</ul>
+<p><small>^ Corresponding author.</small></p>
+<h2 id="abstract">Abstract</h2>
+<p>Human usually composes music by organizing elements according to the musical form to express music ideas. However, for neural network-based music generation, it is difficult to do so due to the lack of labelled data on musical form. In this paper, we develop MeloForm, a system that generates melody with musical form using expert systems and neural networks. Specifically, 1) we design an expert system to generate a melody by developing musical elements from motifs to phrases then to sections with repetitions and variations according to pre-given musical form; 2) considering the generated melody is lack of musical richness, we design a Transformer based refinement model to improve the melody without changing its musical form. MeloForm enjoys the advantages of precise musical form control by expert systems and musical richness learning via neural models. Both subjective and objective experimental evaluations demonstrate that MeloForm generates melodies with precise musical form control with 97.79% accuracy, and outperforms baseline systems in terms of subjective evaluation score by 0.75, 0.50, 0.86 and 0.89 in structure, thematic, richness and overall quality, without any labelled musical form data. Besides, MeloForm can support various kinds of forms, such as verse and chorus form, rondo form, variational form, sonata form, etc.</p>
+<h2 id="baseline-samples">Baseline Samples</h2>
+
+  <table width="86%" border="1">
+    <tbody>
+      <tr>
+        <th width="22%" style="text-align: center" scope="col">Melody from MeloForm</th>
+        <th width="26%" style="text-align: center" scope="col">Description</th>
+      </tr>
+      
+      <tr>
+        <td width="26%" style="text-align: center">
+          <audio controls="controls">
+              <source src="../audio/meloform/meloform/1-melody.mp3" autoplay="">Your browser does not support the audio element.
+          </audio>
+        <td width="26%" style="text-align: left">
+          <p>Section A: (phrase a1: 00:00-00:09; 00:09-00:17; 00:17-00:25);</p>
+          <p>Section B: (phrase b1: 00:25-00:33; 00:33-00:41; 00:41-00:49);</p>
+          <p>Section A: (phrase a1: 00:49-00:57; 00:57-1:05);</p>
+          <p>Section B: (phrase b1: 1:05-1:13; 1:13-1:21);</p>
+          <p>Section A: (phrase a1: 1:21-1:29; 1:29-1:39).</p>
+      </tr>
+      <tr>
+        <td width="26%" style="text-align: center">
+          <audio controls="controls">
+              <source src="../audio/meloform/meloform/2-melody.mp3" autoplay="">Your browser does not support the audio element.
+          </audio>
+        <td width="26%" style="text-align: left">
+          <p>Section A: (phrase a1: 00:00-00:07; 00:07-00:15);</p>
+          <p>Section B: (phrase b1: 00:15-00:23; 00:23-00:31);</p>
+          <p>Section A: (phrase a1: 00:31-00:39; 00:39-00:47);</p>
+      </tr>
+      <tr>
+        <td width="26%" style="text-align: center">
+          <audio controls="controls">
+              <source src="../audio/meloform/meloform/3-melody.mp3" autoplay="">Your browser does not support the audio element.
+          </audio>
+        <td width="26%" style="text-align: left">
+          <p>Section A: (phrase a1: 00:00-00:08; 00:08-00:16);</p>
+          <p>Section B: (phrase b1: 00:16-00:24; 00:24-00:32);</p>
+          <p>Section A: (phrase a1: 00:32-00:40; 00:40-00:48);</p>
+          <p>Section A: (phrase a1: 00:48-00:56; 00:56-01:04);</p>
+      </tr>
+    </tbody>
+  </table>
+
+  <table width="86%" border="1">
+    <tbody>
+      <tr>
+        <th width="22%" style="text-align: center" scope="col">Melody from Music Transformer</th>
+        <th width="26%" style="text-align: center" scope="col">Description</th>
+      </tr>
+      
+      <tr>
+        <td width="26%" style="text-align: center">
+          <audio controls="controls">
+              <source src="../audio/meloform/music_transformer/1-melody.mp3" autoplay="">Your browser does not support the audio element.
+          </audio>
+        <td width="26%" style="text-align: left">
+          <p>Section A: (phrase a1: 00:00-00:09);</p>
+          <p>Section B: (phrase b1: 00:09-00:15);</p>
+          <p>And section B gets repeated until the end.</p>
+      </tr>
+      <tr>
+        <td width="26%" style="text-align: center">
+          <audio controls="controls">
+              <source src="../audio/meloform/music_transformer/2-melody.mp3" autoplay="">Your browser does not support the audio element.
+          </audio>
+        <td width="26%" style="text-align: left">
+          <p>Section A: (phrase a1: 00:00-00:04; 00:04-00:08);</p>
+          <p>Section B: (phrase b1: 00:08-00:12);</p>
+          <p>Section C: (phrase c1: 00:12-00:15);</p>
+          <p>And section C gets repeated until the end.</p>
+      </tr>
+      <tr>
+        <td width="26%" style="text-align: center">
+          <audio controls="controls">
+              <source src="../audio/meloform/music_transformer/3-melody.mp3" autoplay="">Your browser does not support the audio element.
+          </audio>
+        <td width="26%" style="text-align: left">
+          <p>Section A: (phrase a1: 00:00-00:03; 00:04-00:06);</p>
+          <p>Section B: (phrase b1: 00:06-00:18);</p>
+          <p>Section C: (phrase c1: 00:18-00:26);</p>
+          <p>And section C gets repeated until the end.</p>
+      </tr>
+      <tr>
+          <td width="26%" style="text-align: center">
+              <p>Conclusions</p>
+  
+          <td width="26%" style="text-align: center">
+              <p>Although music transformer captures the repetitive patterns, but there are too much (the remaining parts are almost the repetitions.). And inside the phrases, it is hard to figure out the theme.</p>
+      </tr>
+    </tbody>
+  </table>
+
+  <table width="86%" border="1">
+    <tbody>
+      <tr>
+        <th width="22%" style="text-align: center" scope="col">Melody from MELONS</th>
+        <th width="26%" style="text-align: center" scope="col">Description</th>
+      </tr>
+      
+      <tr>
+        <td width="26%" style="text-align: center">
+          <p>prime</p>
+          <audio controls="controls">
+              <source src="../audio/meloform/melons/1-prime.mp3" autoplay="">Your browser does not support the audio element.
+          </audio>
+          <p>melody continuing the prime</p>
+          <audio controls="controls">
+              <source src="../audio/meloform/melons/1-melody.mp3" autoplay="">Your browser does not support the audio element.
+          </audio>
+        <td width="26%" style="text-align: left">
+          <p>Prime: 00:00-00:17;</p>
+          <p>In 00:36, only a part of prime repeated again. There is another repeated pattern in 00:21, 00:49, 01:09. Although there are some repeated segments, the theme is divergent, and the arrangement is out of control.</p>
+      </tr>
+      <tr>
+        <td width="26%" style="text-align: center">
+          <p>prime</p>
+          <audio controls="controls">
+              <source src="../audio/meloform/melons/2-prime.mp3" autoplay="">Your browser does not support the audio element.
+          </audio>
+          <p>melody continuing the prime</p>
+          <audio controls="controls">
+              <source src="../audio/meloform/melons/2-melody.mp3" autoplay="">Your browser does not support the audio element.
+          </audio>
+        <td width="26%" style="text-align: left">
+          <p>Prime: 00:00-00:17;</p>
+          <p>This melody can be divided into 4 sections: 1) 00:00-00:32: The prime get repeated right after the first 8 bars. 2) 00:32-00:64: there are some short-distance repeated patterns in this section. 3) 00:64-01:36: same with 2). 4) 01:36 - end: same with 2) and 3). Although there are much repeated patterns, connection with prime is lost in the following generated parts.</p>
+      </tr>
+      <tr>
+        <td width="26%" style="text-align: center">
+          <p>prime</p>
+          <audio controls="controls">
+              <source src="../audio/meloform/melons/3-prime.mp3" autoplay="">Your browser does not support the audio element.
+          </audio>
+          <p>melody continuing the prime</p>
+          <audio controls="controls">
+              <source src="../audio/meloform/melons/3-melody.mp3" autoplay="">Your browser does not support the audio element.
+          </audio>
+        <td width="26%" style="text-align: left">
+          <p>Prime: 00:00-00:17;</p>
+          <p>Although there are some short repetitive patterns, the prime is lost in the following generated parts and the theme is not obvious.</p>
+      </tr>
+      <tr>
+          <td width="26%" style="text-align: center">
+              <p>Conclusions</p>
+  
+          <td width="26%" style="text-align: left">
+          <p>Although MELONS explicitly construct bar-level structure graph, the connection with prime is lost when distance is too long. Also, the arrangement of fragments is out of control, which may distract listeners from remerbering the main theme. The prime is given from 8 bars of human composed music, which is also limited.</p>
+      </tr>
+    </tbody>
+  </table>
+
+  <table width="86%" border="1">
+    <tbody>
+      <tr>
+        <th width="22%" style="text-align: center" scope="col">Melody from POP909_lm
+        <th width="26%" style="text-align: center" scope="col">Description</th>
+      </tr>
+      
+      <tr>
+        <td width="26%" style="text-align: center">
+          <audio controls="controls">
+              <source src="../audio/meloform/pop909_lm/1-melody.mp3" autoplay="">Your browser does not support the audio element.
+          </audio>
+        <td width="26%" style="text-align: left">
+          <p>Section A: (phrase a1: 00:00-00:08);</p>
+          <p>Section B: (phrase b1: 00:08-00:16; 00:16-00:24; 00:24-00:32; 00:32-00:40);</p>
+          <p>Section A: (phrase a1: 00:40-00:48);</p>
+          <p>Section A: (phrase b1: 00:48-00：56; 00:56-1:04);</p>
+      </tr>
+      <tr>
+        <td width="26%" style="text-align: center">
+          <audio controls="controls">
+              <source src="../audio/meloform/pop909_lm/2-melody.mp3" autoplay="">Your browser does not support the audio element.
+          </audio>
+        <td width="26%" style="text-align: left">
+          <p>Section A: (phrase a1: 00:00-00:08);</p>
+          <p>Section B: (phrase b1: 00:08-00:16; 00:16-00:24);</p>
+          <p>Section A: (phrase a1: 00:24-00:32);</p>
+          <p>Section B: (phrase b1: 00:32-00:40; 00:40-00:48; 00:48-00:56);</p>
+      </tr>
+      <tr>
+        <td width="26%" style="text-align: center">
+          <audio controls="controls">
+              <source src="../audio/meloform/pop909_lm/3-melody.mp3" autoplay="">Your browser does not support the audio element.
+          </audio>
+        <td width="26%" style="text-align: left">
+          <p>Section A: (phrase a1: 00:00-00:08; 00:08-00:16; 00:16-00:24; 00:24-00:32);</p>
+          <p>Section B: (phrase b1: 00:32-00:40; 00:40-00:48; 00:48-00:56);</p>
+          <p>Section B: (phrase b1: 00:56-1:04; 1:04-1:12; 1:12-1:20);</p>
+      </tr>
+      <tr>
+          <td width="26%" style="text-align: center">
+              <p>Conclusions</p>
+  
+          <td width="26%" style="text-align: left">
+          <p>Although pop909_lm can control musical form in some degree, different sections are similar, and the theme is not obvious.</p>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <h2 id="variation-samples">MeloFrom that extends musical form variations</h2>
+
+  <h4>Example 1: <p style='display:inline'>Verse and Chorus Form: A(a1,a1,a1)B(b1,b1,b1)A(a1,a1)B(b1,b1)A(a1,a1)</p></h4>
+<!-- \(A(a_{1}a_{1}a_{1})B(b_{1}b_{1}b_{1})A(a_{1}a_{1})B(b_{1}b_{1})A(a_{1}a_{1})\) -->
+
+
+
+
+<div id="meloform_example1">If you don't have Adobe Reader or PDF support in this web
+    browser. <a href="../audio/meloform/meloform_variation/verse_chorus/1-melody.pdf">Click here to download the PDF</a></div>
+
+<script>
+    PDFObject.embed("../audio/meloform/meloform_variation/verse_chorus/1-melody.pdf", "#meloform_example1");
+</script>
+
+
+<h5>Melody</h5>
+<audio controls="controls">
+    <source src="../audio/meloform/meloform_variation/verse_chorus/1-melody.mp3" autoplay="">Your browser does not support the audio element.
+</audio>
+
+
+<h5>Melody + Accompaniment</h5>
+<audio controls="controls">
+    <source src="../audio/meloform/meloform_variation/verse_chorus/1-twist.mp3" autoplay="">Your browser does not support the audio element.
+</audio>
+
+<h5>Piano Roll Representation</h5>
+<img src="../audio/meloform/meloform_variation/verse_chorus/1-pianoroll.svg" alt="Here is the piano roll for the melody." style="width:700px;height:100%;">
+
+<br>
+<br>
+
+<h5 style='display:inline'>Musical Form Analysis:</h5> <p> This is a melody with verse and chorus form as A(a1,a1,a1)B(b1,b1,b1)A(a1,a1)B(b1,b1)A(a1,a1), where A represents verse and B represents chorus. As seen in the piano roll representation, the average pitch in chorus is much higher than that in verse, and the rhythm pattern is more intense in chorus by having more note density. The motif for phrase a1 and b1 is labeled in blue and orange box respectively, from which the following bars are derived.</p>
+<!-- <p>Development of a1 (2-5 bars): motif (2nd bar) - sequence (3rd bar) - sequence (4th bar) - ending (5th bar)</p>
+<p>Development of a1 (6-9 bars): motif (6th bar) - sequence, transformation (7th bar) - sequence (8th bar) - ending (9th bar)</p>
+<p>Development of a1 (10-13 bars): motif (10th bar) - sequence, transformation (11th bar) - sequence (12th bar) - ending (13th bar)</p>
+<p>Development of b1 (6-9 bars): motif (6th bar) - transformation (7th bar) - sequence (8th bar) - ending (9th bar)</p> -->
+
+<hr>
+
+<h4>Example 2: <p style='display:inline'>Rondo Form: A(a1,a1)B(b1,b1)A(a1,a1)C(c1,c1)A(a1,a1)</p></h4>
+
+<div id="meloform_example2">If you don't have Adobe Reader or PDF support in this web
+    browser. <a href="../audio/meloform/meloform_variation/rondo/1-melody.pdf">Click here to download the PDF</a></div>
+
+<script>
+    PDFObject.embed("../audio/meloform/meloform_variation/rondo/1-melody.pdf", "#meloform_example2");
+</script>
+
+
+<h5>Melody</h5>
+<audio controls="controls">
+    <source src="../audio/meloform/meloform_variation/rondo/1-melody.mp3" autoplay="">Your browser does not support the audio element.
+</audio>
+
+
+<h5>Melody + Accompaniment</h5>
+<audio controls="controls">
+    <source src="../audio/meloform/meloform_variation/rondo/1-jazz.mp3" autoplay="">Your browser does not support the audio element.
+</audio>
+
+<h5>Piano Roll Representation</h5>
+<img src="../audio/meloform/meloform_variation/rondo/1-pianoroll.svg" alt="Here is the piano roll for the melody." style="width:700px;height:100%;">
+
+<br>
+<br>
+
+<h5 style='display:inline'>Musical Form Analysis:</h5> <p> This is a melody with rondo form as A(a1,a1)B(b1,b1)A(a1,a1)C(c1,c1)A(a1,a1). Refrained section A alternates with contrasting sections B and C.</p>
+
+
+
+
+<hr>
+
+<h4>Example 3: <p style='display:inline'>Variational Form: A(a1,a1,a1)A'(a1',a1',a1')A''(a1'',a1'',a1'')</p></h4>
+
+<div id="meloform_example3">If you don't have Adobe Reader or PDF support in this web
+    browser. <a href="../audio/meloform/meloform_variation/variational/1-melody.pdf">Click here to download the PDF</a></div>
+
+<script>
+    PDFObject.embed("../audio/meloform/meloform_variation/variational/1-melody.pdf", "#meloform_example3");
+</script>
+
+
+<h5>Melody</h5>
+<audio controls="controls">
+    <source src="../audio/meloform/meloform_variation/variational/1-melody.mp3" autoplay="">Your browser does not support the audio element.
+</audio>
+
+
+<h5>Melody + Accompaniment</h5>
+<audio controls="controls">
+    <source src="../audio/meloform/meloform_variation/variational/1-blue.mp3" autoplay="">Your browser does not support the audio element.
+</audio>
+
+<h5>Piano Roll Representation</h5>
+<img src="../audio/meloform/meloform_variation/variational/1-pianoroll.svg" alt="Here is the piano roll for the melody." style="width:700px;height:100%;">
+
+<br>
+<br>
+
+<h5 style='display:inline'>Musical Form Analysis:</h5> <p> This is a melody with variational form as A(a1,a1,a1)A'(a1',a1',a1')A''(a1'',a1'',a1''). We firstly generate a melody with musical form as A(a1,a1,a1)A(a1,a1,a1)A(a1,a1,a1) by expert systems, then refine each section separately by neural networks. By refining the same section in different inference step, the melodies in same section can be variant in pitch distribution with rhythm patterns kept. This is only one way for variation, we will release more methods for variational forms together with releasing datasets.</p>
+
+<hr>
+
+
+<h4>Example 4: <p style='display:inline'>Sonata Form: A(a1,a1,a2,a2)B(b1,b1,b1,b1)A'(a1,a1,a1,a1)</p></h4>
+
+<div id="meloform_example4">If you don't have Adobe Reader or PDF support in this web
+    browser. <a href="../audio/meloform/meloform_variation/sonata/1-melody.pdf">Click here to download the PDF</a></div>
+
+<script>
+    PDFObject.embed("../audio/meloform/meloform_variation/sonata/1-melody.pdf", "#meloform_example4");
+</script>
+
+
+<h5>Melody</h5>
+<audio controls="controls">
+    <source src="../audio/meloform/meloform_variation/sonata/1-melody.mp3" autoplay="">Your browser does not support the audio element.
+</audio>
+
+
+<h5>Melody + Accompaniment</h5>
+<audio controls="controls">
+    <source src="../audio/meloform/meloform_variation/sonata/1-cpiano.mp3" autoplay="">Your browser does not support the audio element.
+</audio>
+
+<h5>Piano Roll Representation</h5>
+<img src="../audio/meloform/meloform_variation/sonata/1-pianoroll.svg" alt="Here is the piano roll for the melody." style="width:700px;height:100%;">
+
+<br>
+<br>
+
+<h5 style='display:inline'>Musical Form Analysis:</h5> <p> This is a melody with sonata form as A(a1,a1,a2,a2)B(b1,b1,b1,b1)A'(a1,a1,a1,a1), which are exposition (i.e., A), development (i.e., B), and recapitulation (i.e., A') sections. In exposition section, phrase a1 is firstly introduced in C major scale. To transpose the key to A minor for constructing another phrase a2, we leverage V-I chord progression to reach to the tonic chord in A minor. Specifically, phrase a1 ends in chord 'Em' and phrase a2 starts with 'Am' chord, which construct an 'V-I' harmony progression in A minor that helps transpose to A minor scale. Then we create melodies in development section still in A minor scale, with higher average pitch and more rhythm density for building up more tensions. Finally, we use the same strategy for going back to phrase a1 in C major by transposing. Besides building up this chord progression template, we also set the tonality token as "MAJ" for a1 and "MIN" for a2 and b1 to have model generate phrase in the specific scale. </p>
+
+<hr>
+
+
+			</section>
+		</article>
+	</main>
+
+
+	
+
+</div>
+
+<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-139981676-1', 'auto');
+	ga('send', 'pageview');
+</script>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+<script type="text/x-mathjax-config">
+     MathJax.Hub.Config({
+         HTML: ["input/TeX","output/HTML-CSS"],
+         TeX: {
+                Macros: {
+                         bm: ["\\boldsymbol{#1}", 1],
+                         argmax: ["\\mathop{\\rm arg\\,max}\\limits"],
+                         argmin: ["\\mathop{\\rm arg\\,min}\\limits"]},
+                extensions: ["AMSmath.js","AMSsymbols.js"],
+                equationNumbers: { autoNumber: "AMS" } },
+         extensions: ["tex2jax.js"],
+         jax: ["input/TeX","output/HTML-CSS"],
+         tex2jax: { inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+                    displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+                    processEscapes: true },
+         "HTML-CSS": { availableFonts: ["TeX"],
+                       linebreaks: { automatic: true } }
+     });
+ </script>
+
+ <script type="text/x-mathjax-config">
+     MathJax.Hub.Config({
+       tex2jax: {
+         skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+       }
+     });
+ </script>
+
+ <script type="text/javascript" async
+   src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML">
+ </script>
+
+
+
+
+</body>
+</html>
