@@ -12,7 +12,7 @@
       <link>https://peilnlu.github.io/meloform/</link>
       <pubDate>Tue, 03 May 2022 19:59:32 +0800</pubDate>
       
-      <guid>https://speechresearch.github.io/naturalspeech/</guid>
+      <guid>https://peilnlu.github.io/meloform/</guid>
       <description>Abstract Text to speech (TTS) has made rapid progress in both academia and industry in recent years. Some questions naturally arise that whether a TTS system can achieve human-level quality, how to define/judge human-level quality and how to achieve it. In this paper, we answer these questions by first defining the criterion of human-level quality based on statistical significance of measurement and describing the guidelines to judge it, and then proposing a TTS system called NaturalSpeech that achieves human-level quality on a benchmark dataset.</description>
     </item>
     <item>
